@@ -1,7 +1,6 @@
 package com.musinsa.product.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -90,5 +89,33 @@ class ProductServiceUnitTest {
                 .isInstanceOf(NotExistCategoryException.class);
         then(brandRepository).should().findById(anyLong());
         then(categoryRepository).should().findById(anyLong());
+    }
+
+    @DisplayName("product 삭제 성공: product가 존재할 경우")
+    @Test
+    void deleteProduct_WhenExistProduct_ShouldSuccess() {
+        // given
+        Long existId = 1L;
+        Product returnProduct = new Product(1L, 1L, new Money(new BigDecimal(1L)));
+        given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
+
+        // when
+        service.deleteProduct(existId);
+
+        // then
+        assertThat(returnProduct.getDeleted()).isTrue();
+        then(productRepository).should().findById(anyLong());
+    }
+
+    @DisplayName("product 삭제 실패: product가 존재하지 않을 경우")
+    @Test
+    void deleteProduct_WhenNotExistProduct_ShouldThrowException() {
+        // given
+        given(productRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> service.deleteProduct(1L))
+                .isInstanceOf(NotExistProductException.class);
+        then(productRepository).should().findById(anyLong());
     }
 }

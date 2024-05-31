@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.musinsa.brand.domain.BrandRepository;
 import com.musinsa.category.domain.CategoryRepository;
+import com.musinsa.product.domain.Product;
 import com.musinsa.product.domain.ProductRepository;
 
 @Service
@@ -40,5 +41,14 @@ public class ProductService {
         categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() -> new NotExistCategoryException("해당 카테고리가 존재하지 않습니다."));
+    }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product findProduct =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new NotExistProductException("해당 프로덕트가 존재하지 않습니다."));
+        findProduct.delete();
     }
 }

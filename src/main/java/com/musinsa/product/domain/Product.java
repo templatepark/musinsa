@@ -35,4 +35,12 @@ public class Product extends BaseTimeEntity {
     public Long getId() {
         return id;
     }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void delete() {
+        deleted = Boolean.TRUE;
+    }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import com.musinsa.brand.domain.Brand;
 import com.musinsa.brand.domain.BrandRepository;
 import com.musinsa.category.domain.Category;
 import com.musinsa.category.domain.CategoryRepository;
+import com.musinsa.product.domain.Money;
+import com.musinsa.product.domain.Product;
 import com.musinsa.product.domain.ProductRepository;
 
 @Transactional
@@ -69,5 +72,31 @@ class ProductServiceIntegrationTest {
         // when, then
         assertThatThrownBy(() -> service.saveProduct(request))
                 .isInstanceOf(NotExistCategoryException.class);
+    }
+
+    @DisplayName("product 삭제 성공: product가 존재할 경우")
+    @Test
+    void deleteProduct_WhenExistProduct_ShouldSuccess() {
+        // given
+        Product savedProduct = repository.save(new Product(1L, 1L, new Money(price)));
+
+        // when
+        service.deleteProduct(savedProduct.getId());
+
+        // then
+        Optional<Product> findProduct = repository.findById(savedProduct.getId());
+        assertThat(findProduct).isPresent();
+        assertThat(findProduct.get().getDeleted()).isTrue();
+    }
+
+    @DisplayName("product 삭제 실패: product가 존재하지 않을 경우")
+    @Test
+    void deleteProduct_WhenNotExistProduct_ShouldThrowException() {
+        // given
+        Long notExistId = 1L;
+
+        // when, then
+        assertThatThrownBy(() -> service.deleteProduct(notExistId))
+                .isInstanceOf(NotExistProductException.class);
     }
 }
