@@ -6,6 +6,10 @@ spring:
       enabled: true
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:musinsa
+    url: jdbc:h2:mem:musinsa;MODE=MySQL
     username: sa
     password:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
