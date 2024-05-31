@@ -2,8 +2,10 @@ package com.musinsa.product.presentation;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,10 +62,10 @@ class ProductControllerUnitTest {
                                         String.format("/api/v1/products/%d", expectedId)));
     }
 
-    @DisplayName("product 저장 성공: request가 invalid한 경우")
+    @DisplayName("product 저장 실패: request가 invalid한 경우")
     @ParameterizedTest(name = "[{index}]: brandId={0}, categoryId={1}, price={2}")
     @MethodSource("provideParametersForSaveProduct")
-    void saveProduct_WhenInValidRequest_ShouldShouldThrowException(
+    void saveProduct_WhenInValidRequest_ShouldThrowException(
             Long brandId, Long categoryId, BigDecimal price) throws Exception {
         // given
         ProductSaveRequest request = new ProductSaveRequest(brandId, categoryId, price);
@@ -86,5 +88,34 @@ class ProductControllerUnitTest {
                 Arguments.of(0L, 1L, new BigDecimal(1L)),
                 Arguments.of(1L, 0L, new BigDecimal(1L)),
                 Arguments.of(1L, 1L, new BigDecimal(0L)));
+    }
+
+    @DisplayName("product 삭제 성공: request가 valid한 경우")
+    @Test
+    void deleteProduct_WhenValidRequest_ShouldReturnOk() throws Exception {
+        // given
+        Long deleteTargetId = 1L;
+
+        // when
+        ResultActions result =
+                mockMvc.perform(delete("/api/v1/products/{productId}", deleteTargetId));
+        // then
+        result.andExpect(status().isOk());
+        then(productService).should().deleteProduct(anyLong());
+    }
+
+    @DisplayName("product 삭제 실패: request가 invalid한 경우")
+    @Test
+    void deleteProduct_WhenInValidRequest_ShouldThrowException() throws Exception {
+        // given
+        Long deleteTargetId = 0L;
+
+        // when
+        ResultActions result =
+                mockMvc.perform(delete("/api/v1/products/{productId}", deleteTargetId));
+
+        // then
+        result.andExpect(status().isBadRequest());
+        then(productService).shouldHaveNoInteractions();
     }
 }

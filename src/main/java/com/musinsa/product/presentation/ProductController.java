@@ -2,11 +2,11 @@ package com.musinsa.product.presentation;
 
 import java.net.URI;
 
+import jakarta.validation.constraints.Min;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.musinsa.product.application.ProductSaveRequest;
 import com.musinsa.product.application.ProductService;
@@ -26,5 +26,12 @@ public class ProductController {
         return ResponseEntity.created(
                         URI.create(String.format("/api/v1/products/%d", savedProductId)))
                 .build();
+    }
+
+    @DeleteMapping(path = "/api/v1/products/{productId}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable(name = "productId") @Min(1L) Long productId) {
+        productService.deleteProduct(productId);
+        return ResponseEntity.ok().build();
     }
 }
