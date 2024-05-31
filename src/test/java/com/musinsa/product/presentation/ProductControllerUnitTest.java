@@ -5,8 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musinsa.product.application.ProductSaveRequest;
 import com.musinsa.product.application.ProductService;
+import com.musinsa.product.application.ProductUpdateRequest;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerUnitTest {
@@ -117,5 +117,49 @@ class ProductControllerUnitTest {
         // then
         result.andExpect(status().isBadRequest());
         then(productService).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("product 업데이트 성공: request가 valid한 경우")
+    @Test
+    void updateProduct_WhenValidRequest_ShouldReturnOk() throws Exception {
+        // given
+        Long updateTargetId = 1L;
+        ProductUpdateRequest request = new ProductUpdateRequest(1L, 1L, new BigDecimal(1L));
+
+        // when
+        ResultActions result =
+                mockMvc.perform(
+                        put("/api/v1/products/{productId}", updateTargetId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        result.andExpect(status().isOk());
+        then(productService).should().updateProduct(anyLong(), any());
+    }
+
+    @DisplayName("product 업데이트 실패: request가 invalid한 경우")
+    @ParameterizedTest(name = "[{index}]: updateTargetId={0}, request={1}")
+    @MethodSource("provideParametersForUpdateProduct")
+    void updateProduct_WhenInValidRequest_ShouldThrowException(
+            Long updateTargetId, ProductUpdateRequest request) throws Exception {
+        // given, when
+        ResultActions result =
+                mockMvc.perform(
+                        put("/api/v1/products/{productId}", updateTargetId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        result.andExpect(status().isBadRequest());
+        then(productService).shouldHaveNoInteractions();
+    }
+
+    static Stream<Arguments> provideParametersForUpdateProduct() {
+        return Stream.of(
+                Arguments.of(0L, new ProductUpdateRequest(1L, 1L, new BigDecimal(1L))),
+                Arguments.of(1L, new ProductUpdateRequest(0L, 1L, new BigDecimal(1L))),
+                Arguments.of(1L, new ProductUpdateRequest(1L, 0L, new BigDecimal(1L))),
+                Arguments.of(1L, new ProductUpdateRequest(1L, 1L, new BigDecimal(0L))));
     }
 }
