@@ -96,7 +96,7 @@ class ProductServiceUnitTest {
     void deleteProduct_WhenExistProduct_ShouldSuccess() {
         // given
         Long existId = 1L;
-        Product returnProduct = new Product(1L, 1L, new Money(new BigDecimal(1L)));
+        Product returnProduct = new Product(1L, 1L, new Money(PRICE));
         given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
 
         // when
@@ -115,6 +115,33 @@ class ProductServiceUnitTest {
 
         // when, then
         assertThatThrownBy(() -> service.deleteProduct(1L))
+                .isInstanceOf(NotExistProductException.class);
+        then(productRepository).should().findById(anyLong());
+    }
+
+    @DisplayName("product 업데이트 성공: product가 존재할 경우")
+    @Test
+    void updateProduct_WhenExistProduct_ShouldSuccess() {
+        // given
+        Product returnProduct = new Product(1L, 1L, new Money(PRICE));
+        given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
+
+        ProductUpdateRequest request = new ProductUpdateRequest(2L, 2L, new BigDecimal(2L));
+
+        // when, then
+        assertThatCode(() -> service.updateProduct(1L, request)).doesNotThrowAnyException();
+        then(productRepository).should().findById(anyLong());
+    }
+
+    @DisplayName("product 업데이트 실패: product가 존재하지 않을 경우")
+    @Test
+    void updateProduct_WhenNotExistProduct_ShouldThrowException() {
+        // given
+        ProductUpdateRequest request = new ProductUpdateRequest(1L, 1L, PRICE);
+        given(productRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> service.updateProduct(1L, request))
                 .isInstanceOf(NotExistProductException.class);
         then(productRepository).should().findById(anyLong());
     }

@@ -2,8 +2,11 @@ package com.musinsa.product.domain;
 
 import jakarta.persistence.*;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.musinsa.common.domain.BaseTimeEntity;
 
+@SQLRestriction("deleted = false")
 @Entity
 @Table(name = "product")
 public class Product extends BaseTimeEntity {
@@ -36,11 +39,29 @@ public class Product extends BaseTimeEntity {
         return id;
     }
 
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public Money getPrice() {
+        return price;
+    }
+
     public Boolean getDeleted() {
         return deleted;
     }
 
     public void delete() {
         deleted = Boolean.TRUE;
+    }
+
+    public void updateFrom(Product product) {
+        this.brandId = product.getBrandId();
+        this.categoryId = product.getCategoryId();
+        this.price = product.getPrice();
     }
 }

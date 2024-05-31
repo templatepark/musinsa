@@ -45,10 +45,19 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long productId) {
-        Product findProduct =
-                productRepository
-                        .findById(productId)
-                        .orElseThrow(() -> new NotExistProductException("해당 프로덕트가 존재하지 않습니다."));
+        Product findProduct = findProductByIdOrThrow(productId);
         findProduct.delete();
+    }
+
+    @Transactional
+    public void updateProduct(Long productId, ProductUpdateRequest request) {
+        Product findProduct = findProductByIdOrThrow(productId);
+        findProduct.updateFrom(request.toProduct());
+    }
+
+    private Product findProductByIdOrThrow(Long productId) {
+        return productRepository
+                .findById(productId)
+                .orElseThrow(() -> new NotExistProductException("해당 프로덕트가 존재하지 않습니다."));
     }
 }
