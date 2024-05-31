@@ -1,10 +1,11 @@
 package com.musinsa.brand.domain;
 
+import com.musinsa.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "brand")
-public class Brand {
+public class Brand extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
