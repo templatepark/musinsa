@@ -1,0 +1,73 @@
+package com.musinsa.product.application;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.musinsa.brand.domain.Brand;
+import com.musinsa.brand.domain.BrandRepository;
+import com.musinsa.category.domain.Category;
+import com.musinsa.category.domain.CategoryRepository;
+import com.musinsa.product.domain.ProductRepository;
+
+@Transactional
+@SpringBootTest
+class ProductServiceIntegrationTest {
+
+    @Autowired private ProductService service;
+
+    @Autowired private ProductRepository repository;
+    @Autowired private BrandRepository brandRepository;
+    @Autowired private CategoryRepository categoryRepository;
+
+    private static final BigDecimal price = new BigDecimal(1L);
+
+    @DisplayName("product 저장 성공: brand, category가 존재할 경우")
+    @Test
+    void saveProduct_WhenExistBrandAndCategory_ShouldReturnProductId() {
+        // given
+        Long existBrandId = brandRepository.save(new Brand("musinsa")).getId();
+        Long existCategoryId = categoryRepository.save(new Category("상의")).getId();
+        ProductSaveRequest request = new ProductSaveRequest(existBrandId, existCategoryId, price);
+
+        // when
+        Long savedId = service.saveProduct(request);
+
+        // then
+        assertThat(savedId).isNotNull();
+        assertThat(repository.findById(savedId)).isPresent();
+    }
+
+    @DisplayName("product 저장 실패: brand가 존재하지 않을 경우")
+    @Test
+    void saveProduct_WhenNotExistBrand_ShouldThrowException() {
+        // given
+        Long notExistId = 1L;
+        Long existCategoryId = categoryRepository.save(new Category("상의")).getId();
+        ProductSaveRequest request = new ProductSaveRequest(notExistId, existCategoryId, price);
+
+        // when, then
+        assertThatThrownBy(() -> service.saveProduct(request))
+                .isInstanceOf(NotExistBrandException.class);
+    }
+
+    @DisplayName("product 저장 실패: category가 존재하지 않을 경우")
+    @Test
+    void saveProduct_WhenNotExistCategory_ShouldThrowException() {
+        // given
+        Long notExistId = 1L;
+        Long existBrandId = brandRepository.save(new Brand("musinsa")).getId();
+        ProductSaveRequest request = new ProductSaveRequest(existBrandId, notExistId, price);
+
+        // when, then
+        assertThatThrownBy(() -> service.saveProduct(request))
+                .isInstanceOf(NotExistCategoryException.class);
+    }
+}
