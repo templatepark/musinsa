@@ -29,4 +29,9 @@ public class ProductQueryService {
                 .map(CategoryBrandPriceResponse::price)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public CategoryLowestAndHighestPriceResponse getLowestAndHighestPricesByCategoryName(
+            String categoryName) {
+        return productQueryRepository.getLowestAndHighestPricesByCategoryName(categoryName);
+    }
 }
