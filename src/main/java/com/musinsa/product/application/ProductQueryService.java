@@ -30,6 +30,10 @@ public class ProductQueryService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public BrandLowestPriceResponse getLowestTotalBrandPrice() {
+        return productQueryRepository.getLowestTotalBrandPrice();
+    }
+
     public CategoryLowestAndHighestPriceResponse getLowestAndHighestPricesByCategoryName(
             String categoryName) {
         return productQueryRepository.getLowestAndHighestPricesByCategoryName(categoryName);

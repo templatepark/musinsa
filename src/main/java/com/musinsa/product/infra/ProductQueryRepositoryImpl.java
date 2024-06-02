@@ -4,13 +4,17 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.musinsa.product.application.BrandCategoryTotalResponse;
+import com.musinsa.product.application.BrandLowestPriceResponse;
 import com.musinsa.product.application.BrandPriceResponse;
 import com.musinsa.product.application.CategoryBrandPriceResponse;
 import com.musinsa.product.application.CategoryLowestAndHighestPriceResponse;
+import com.musinsa.product.application.CategoryPriceResponse;
 import com.musinsa.product.domain.ProductQueryRepository;
 
 @Repository
@@ -42,17 +46,56 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
 
         jdbcTemplate.query(
                 connection -> connection.prepareStatement(sql),
-                (rs, rowNum) -> {
+                (rs) -> {
                     String categoryName = rs.getString("category_name");
                     String brandName = rs.getString("brand_name");
                     BigDecimal price = rs.getBigDecimal("price");
 
                     categoryBrandPrices.add(
                             new CategoryBrandPriceResponse(categoryName, brandName, price));
-                    return null;
                 });
 
         return categoryBrandPrices;
+    }
+
+    @Override
+    public BrandLowestPriceResponse getLowestTotalBrandPrice() {
+        String sql =
+                "WITH MinBrand AS ( "
+                        + "    SELECT p.brand_id, b.brand_name, SUM(p.price) AS total_price "
+                        + "    FROM product p "
+                        + "    INNER JOIN brand b ON p.brand_id = b.brand_id "
+                        + "    WHERE p.deleted = false "
+                        + "    GROUP BY p.brand_id, b.brand_name "
+                        + "    ORDER BY total_price "
+                        + "    LIMIT 1 "
+                        + ") "
+                        + "SELECT c.category_name, mb.brand_name, p.price "
+                        + "FROM product p "
+                        + "INNER JOIN category c ON p.category_id = c.category_id "
+                        + "INNER JOIN MinBrand mb ON p.brand_id = mb.brand_id "
+                        + "WHERE p.deleted = false "
+                        + "ORDER BY c.category_name";
+
+        List<CategoryPriceResponse> categoryPrices = new ArrayList<>();
+        AtomicReference<String> brandName = new AtomicReference<>(null);
+        AtomicReference<BigDecimal> totalPrice = new AtomicReference<>(BigDecimal.ZERO);
+
+        jdbcTemplate.query(
+                connection -> connection.prepareStatement(sql),
+                (rs, rowNum) -> {
+                    String categoryName = rs.getString("category_name");
+                    String brand = rs.getString("brand_name");
+                    BigDecimal price = rs.getBigDecimal("price");
+
+                    categoryPrices.add(new CategoryPriceResponse(categoryName, price));
+                    brandName.set(brand);
+                    totalPrice.set(totalPrice.get().add(price));
+                    return null;
+                });
+
+        return new BrandLowestPriceResponse(
+                new BrandCategoryTotalResponse(brandName.get(), categoryPrices, totalPrice.get()));
     }
 
     @Override

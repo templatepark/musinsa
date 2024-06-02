@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.musinsa.product.application.BrandLowestPriceResponse;
 import com.musinsa.product.application.CategoryLowestAndHighestPriceResponse;
 import com.musinsa.product.application.CategoryLowestPriceResponse;
 import com.musinsa.product.application.ProductQueryService;
@@ -23,6 +24,11 @@ public class ProductQueryController {
     @GetMapping(path = "/api/v1/products/category-lowest-prices")
     public ResponseEntity<CategoryLowestPriceResponse> getCategoryLowestPrices() {
         return ResponseEntity.ok().body(productQueryService.getCategoryLowestPrices());
+    }
+
+    @GetMapping(path = "/api/v1/products/lowest-total-brand-price")
+    public ResponseEntity<BrandLowestPriceResponse> getLowestTotalBrandPrice() {
+        return ResponseEntity.ok().body(productQueryService.getLowestTotalBrandPrice());
     }
 
     @GetMapping(path = "/api/v1/products/category-lowest-highest-prices")
