@@ -19,7 +19,7 @@ VALUES ('상의', NOW(), NOW()),
        ('양말', NOW(), NOW()),
        ('액세서리', NOW(), NOW());
 
-INSERT INTO product(category_id, brand_id, price, deleted, created_at, updated_at)
+INSERT INTO product(brand_id, category_id, price, deleted, created_at, updated_at)
 VALUES (1, 1, 11_200, false, NOW(), NOW()),
        (1, 2, 5_500, false, NOW(), NOW()),
        (1, 3, 4_200, false, NOW(), NOW()),
