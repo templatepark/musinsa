@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>브랜드 등록</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>브랜드 등록</h1>
+<form id="saveBrandForm" onsubmit="return saveBrand();">
+  <label for="brandName">브랜드명:</label>
+  <input type="text" id="brandName" name="brandName" required><br>
+  <button type="submit">등록</button>
+</form>
+
+<script th:inline="javascript">
+  function saveBrand() {
+    const form = document.getElementById('saveBrandForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return false;
+    }
+
+    const formData = {
+      brandName: document.getElementById('brandName').value
+    };
+
+    $.ajax({
+      url: '/api/v1/brands',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      success: function(response) {
+        alert('Brand saved successfully');
+        window.location.href = '/';
+      },
+      error: function(xhr, status, error) {
+        alert(xhr.responseJSON.detail);
+      }
+    });
+
+    return false;
+  }
+</script>
+</body>
+</html>

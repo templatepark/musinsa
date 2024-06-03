@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>상품 수정</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>상품 수정</h1>
+<form id="updateForm" onsubmit="return updateProduct();">
+    <label for="productId">상품 ID:</label>
+    <input type="number" id="productId" name="productId" required><br>
+    <label for="brandId">브랜드 ID:</label>
+    <input type="number" id="brandId" name="brandId" required><br>
+    <label for="categoryId">카테고리 ID:</label>
+    <input type="number" id="categoryId" name="categoryId" required><br>
+    <label for="price">가격:</label>
+    <input type="number" id="price" name="price" required><br>
+    <button type="submit">수정</button>
+</form>
+
+<script th:inline="javascript">
+    function updateProduct() {
+        const form = document.getElementById('updateForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
+
+        const productId = document.getElementById('productId').value;
+        const formData = {
+            brandId: document.getElementById('brandId').value,
+            categoryId: document.getElementById('categoryId').value,
+            price: document.getElementById('price').value
+        };
+
+        $.ajax({
+            url: '/api/v1/products/' + productId,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                alert('Product updated successfully');
+                window.location.href = '/';
+            },
+            error: function(xhr, status, error) {
+                alert(xhr.responseJSON.detail);
+            }
+        });
+
+        return false; // Prevent form submission
+    }
+</script>
+</body>
+</html>

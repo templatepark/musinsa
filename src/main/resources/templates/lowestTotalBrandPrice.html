@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>단일브랜드 최저가</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<h1>단일브랜드 최저가</h1>
+<p th:text="${'브랜드: ' + response.lowestPrice.brandName}"></p>
+<p th:text="${'총액: ' + response.lowestPrice.totalPrice}"></p>
+<table>
+    <thead>
+    <tr>
+        <th>카테고리</th>
+        <th>가격</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="categorie : ${response.lowestPrice.categories}">
+        <td th:text="${categorie.categoryName}"></td>
+        <td th:text="${categorie.price}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

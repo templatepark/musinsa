@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>카테고리 검색</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<h1>카테고리 검색</h1>
+<form method="get" th:action="@{/products/category}">
+    <label for="categoryName">카테고리명:</label>
+    <input type="text" id="categoryName" name="categoryName" required>
+    <button type="submit">검색</button>
+</form>
+</body>
+</html>

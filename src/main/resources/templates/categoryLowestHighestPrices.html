@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Category Prices</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<h1>Category Prices</h1>
+<p th:text="${'Category Name: ' + response.categoryName}"></p>
+<table>
+    <thead>
+    <tr>
+        <th>Lowest Brand Name</th>
+        <th>Lowest Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="lowestBrandPrices : ${response.lowestBrandPrices}">
+        <td th:text="${lowestBrandPrices.brandName}"></td>
+        <td th:text="${lowestBrandPrices.price}"></td>
+    </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+    <tr>
+        <th>Highest Brand Name</th>
+        <th>Highest Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="highestBrandPrices : ${response.highestBrandPrices}">
+        <td th:text="${highestBrandPrices.brandName}"></td>
+        <td th:text="${highestBrandPrices.price}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
