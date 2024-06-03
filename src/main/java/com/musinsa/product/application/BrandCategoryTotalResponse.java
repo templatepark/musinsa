@@ -4,4 +4,4 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record BrandCategoryTotalResponse(
-        String brand, List<CategoryPriceResponse> categories, BigDecimal totalPrice) {}
+        String brandName, List<CategoryPriceResponse> categories, BigDecimal totalPrice) {}
