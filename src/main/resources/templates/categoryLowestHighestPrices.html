@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Category Prices</title>
+    <title>최저가/최고가 카테고리</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<h1>Category Prices</h1>
-<p th:text="${'Category Name: ' + response.categoryName}"></p>
+<h1>최저가/최고가 카테고리</h1>
+<p th:text="${'카테고리: ' + response.categoryName}"></p>
 <table>
     <thead>
     <tr>
-        <th>Lowest Brand Name</th>
-        <th>Lowest Price</th>
+        <th>최저가 브랜드</th>
+        <th>가격</th>
     </tr>
     </thead>
     <tbody>
@@ -24,8 +24,8 @@
 <table>
     <thead>
     <tr>
-        <th>Highest Brand Name</th>
-        <th>Highest Price</th>
+        <th>최고가 브랜드</th>
+        <th>가격</th>
     </tr>
     </thead>
     <tbody>
