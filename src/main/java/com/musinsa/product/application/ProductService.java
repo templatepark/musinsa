@@ -52,6 +52,8 @@ public class ProductService {
     @Transactional
     public void updateProduct(Long productId, ProductUpdateRequest request) {
         Product findProduct = findProductByIdOrThrow(productId);
+        validateExistBrand(request.brandId());
+        validateExistCategory(request.categoryId());
         findProduct.updateFrom(request.toProduct());
     }
 
