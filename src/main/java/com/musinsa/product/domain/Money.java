@@ -14,6 +14,9 @@ public class Money {
     protected Money() {}
 
     public Money(BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NegativeMoneyException("0 보다 작을수 없습니다.");
+        }
         this.value = value;
     }
 
