@@ -5,6 +5,11 @@ import static org.assertj.core.api.Assertions.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import com.musinsa.product.application.dto.ProductSaveRequest;
+import com.musinsa.product.application.dto.ProductUpdateRequest;
+import com.musinsa.product.application.exception.NotExistBrandException;
+import com.musinsa.product.application.exception.NotExistCategoryException;
+import com.musinsa.product.application.exception.NotExistProductException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.musinsa.brand.application;
+package com.musinsa.brand.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

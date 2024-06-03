@@ -1,4 +1,4 @@
-package com.musinsa.product.presentation;
+package com.musinsa.product.presentation.api;
 
 import java.net.URI;
 
@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.musinsa.product.application.ProductSaveRequest;
+import com.musinsa.product.application.dto.ProductSaveRequest;
 import com.musinsa.product.application.ProductService;
-import com.musinsa.product.application.ProductUpdateRequest;
+import com.musinsa.product.application.dto.ProductUpdateRequest;
 
 @RestController
 public class ProductController {

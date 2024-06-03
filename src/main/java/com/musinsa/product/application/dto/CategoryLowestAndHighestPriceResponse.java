@@ -1,4 +1,4 @@
-package com.musinsa.product.application;
+package com.musinsa.product.application.dto;
 
 import java.util.List;
 

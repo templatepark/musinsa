@@ -3,6 +3,8 @@ package com.musinsa.brand.application;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.musinsa.brand.application.dto.BrandSaveRequest;
+import com.musinsa.brand.application.exception.AlreadyBrandNameException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

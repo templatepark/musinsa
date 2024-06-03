@@ -1,4 +1,4 @@
-package com.musinsa.product.domain;
+package com.musinsa.product.domain.exception;
 
 public class NegativeMoneyException extends RuntimeException {
     public NegativeMoneyException(String message) {

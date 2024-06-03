@@ -1,4 +1,4 @@
-package com.musinsa.product.presentation;
+package com.musinsa.product.presentation.api;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.musinsa.product.application.BrandLowestPriceResponse;
-import com.musinsa.product.application.CategoryLowestAndHighestPriceResponse;
-import com.musinsa.product.application.CategoryLowestPriceResponse;
+import com.musinsa.product.application.dto.BrandLowestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestPriceResponse;
 import com.musinsa.product.application.ProductQueryService;
 
 @RestController

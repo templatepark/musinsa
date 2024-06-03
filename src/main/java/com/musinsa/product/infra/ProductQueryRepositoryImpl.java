@@ -9,12 +9,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.musinsa.product.application.BrandCategoryTotalResponse;
-import com.musinsa.product.application.BrandLowestPriceResponse;
-import com.musinsa.product.application.BrandPriceResponse;
-import com.musinsa.product.application.CategoryBrandPriceResponse;
-import com.musinsa.product.application.CategoryLowestAndHighestPriceResponse;
-import com.musinsa.product.application.CategoryPriceResponse;
+import com.musinsa.product.application.dto.BrandCategoryTotalResponse;
+import com.musinsa.product.application.dto.BrandLowestPriceResponse;
+import com.musinsa.product.application.dto.BrandPriceResponse;
+import com.musinsa.product.application.dto.CategoryBrandPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
+import com.musinsa.product.application.dto.CategoryPriceResponse;
 import com.musinsa.product.domain.ProductQueryRepository;
 
 @Repository

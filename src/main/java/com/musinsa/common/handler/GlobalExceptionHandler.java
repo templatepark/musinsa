@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import com.musinsa.brand.application.AlreadyBrandNameException;
-import com.musinsa.product.application.NotExistBrandException;
-import com.musinsa.product.application.NotExistCategoryException;
-import com.musinsa.product.application.NotExistProductException;
+import com.musinsa.brand.application.exception.AlreadyBrandNameException;
+import com.musinsa.product.application.exception.NotExistBrandException;
+import com.musinsa.product.application.exception.NotExistCategoryException;
+import com.musinsa.product.application.exception.NotExistProductException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

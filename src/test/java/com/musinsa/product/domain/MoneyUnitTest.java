@@ -1,10 +1,10 @@
 package com.musinsa.product.domain;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 
+import com.musinsa.product.domain.exception.NegativeMoneyException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

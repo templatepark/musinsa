@@ -1,5 +1,8 @@
-package com.musinsa.product.presentation;
+package com.musinsa.product.presentation.ui;
 
+import com.musinsa.product.application.dto.BrandLowestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestPriceResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

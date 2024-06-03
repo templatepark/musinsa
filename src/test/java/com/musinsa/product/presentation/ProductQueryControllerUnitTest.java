@@ -1,6 +1,5 @@
 package com.musinsa.product.presentation;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -11,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.musinsa.product.application.dto.*;
+import com.musinsa.product.presentation.api.ProductQueryController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

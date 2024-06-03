@@ -1,4 +1,4 @@
-package com.musinsa.product.application;
+package com.musinsa.product.application.exception;
 
 public class NotExistBrandException extends RuntimeException {
     public NotExistBrandException(String message) {
