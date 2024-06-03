@@ -6,8 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.musinsa.brand.application.dto.BrandSaveRequest;
-import com.musinsa.brand.application.exception.AlreadyBrandNameException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.musinsa.brand.application.dto.BrandSaveRequest;
+import com.musinsa.brand.application.exception.AlreadyBrandNameException;
 import com.musinsa.brand.domain.Brand;
 import com.musinsa.brand.domain.BrandRepository;
 

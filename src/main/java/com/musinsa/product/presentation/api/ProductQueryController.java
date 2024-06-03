@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.musinsa.product.application.ProductQueryService;
 import com.musinsa.product.application.dto.BrandLowestPriceResponse;
 import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
 import com.musinsa.product.application.dto.CategoryLowestPriceResponse;
-import com.musinsa.product.application.ProductQueryService;
 
 @RestController
 public class ProductQueryController {

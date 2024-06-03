@@ -1,10 +1,10 @@
 package com.musinsa.brand.application;
 
-import com.musinsa.brand.application.dto.BrandSaveRequest;
-import com.musinsa.brand.application.exception.AlreadyBrandNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.musinsa.brand.application.dto.BrandSaveRequest;
+import com.musinsa.brand.application.exception.AlreadyBrandNameException;
 import com.musinsa.brand.domain.BrandRepository;
 
 @Service

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 
-import com.musinsa.product.application.dto.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import com.musinsa.brand.domain.Brand;
 import com.musinsa.brand.domain.BrandRepository;
 import com.musinsa.category.domain.Category;
 import com.musinsa.category.domain.CategoryRepository;
+import com.musinsa.product.application.dto.*;
 import com.musinsa.product.domain.Money;
 import com.musinsa.product.domain.Product;
 import com.musinsa.product.domain.ProductRepository;

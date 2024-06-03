@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import com.musinsa.product.presentation.api.ProductController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,8 +24,9 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musinsa.AbstractRestDocsTests;
-import com.musinsa.product.application.dto.ProductSaveRequest;
 import com.musinsa.product.application.ProductService;
+import com.musinsa.product.application.dto.ProductSaveRequest;
+import com.musinsa.product.presentation.api.ProductController;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerUnitTest extends AbstractRestDocsTests {

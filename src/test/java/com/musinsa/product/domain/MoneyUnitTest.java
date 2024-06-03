@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.math.BigDecimal;
 
-import com.musinsa.product.domain.exception.NegativeMoneyException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.musinsa.product.domain.exception.NegativeMoneyException;
 
 class MoneyUnitTest {
 

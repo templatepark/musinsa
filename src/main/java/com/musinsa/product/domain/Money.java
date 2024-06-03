@@ -2,9 +2,10 @@ package com.musinsa.product.domain;
 
 import java.math.BigDecimal;
 
-import com.musinsa.product.domain.exception.NegativeMoneyException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+
+import com.musinsa.product.domain.exception.NegativeMoneyException;
 
 @Embeddable
 public class Money {

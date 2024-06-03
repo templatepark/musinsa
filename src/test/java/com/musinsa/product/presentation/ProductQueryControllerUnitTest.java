@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.musinsa.product.application.dto.*;
-import com.musinsa.product.presentation.api.ProductQueryController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +24,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musinsa.product.application.*;
+import com.musinsa.product.application.dto.*;
+import com.musinsa.product.presentation.api.ProductQueryController;
 
 @WebMvcTest(ProductQueryController.class)
 class ProductQueryControllerUnitTest {
