@@ -14,6 +14,6 @@ public record ProductSaveRequest(
         @NotNull @Min(1L) BigDecimal price) {
 
     public Product toProduct() {
-        return new Product(categoryId, brandId, new Money(price));
+        return new Product(brandId, categoryId, new Money(price));
     }
 }
