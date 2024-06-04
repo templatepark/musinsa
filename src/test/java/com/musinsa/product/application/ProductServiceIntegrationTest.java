@@ -104,16 +104,22 @@ class ProductServiceIntegrationTest {
                 .isInstanceOf(NotExistProductException.class);
     }
 
-    @DisplayName("product 업데이트 성공: product가 존재할 경우")
+    @DisplayName("product 업데이트 성공: product, brand, category가 존재할 경우")
     @Test
     void updateProduct_WhenExistProduct_ShouldSuccess() {
         // given
-        Long changedBrandId = 2L;
-        Long changedCategoryId = 2L;
         BigDecimal changedPrice = new BigDecimal(2L);
+        Brand originBrand = brandRepository.save(new Brand("BRAND_A"));
+        Brand changedBrand = brandRepository.save(new Brand("BRAND_B"));
+        Category originCategory = categoryRepository.save(new Category("CATEGORY_A"));
+        Category changedCategory = categoryRepository.save(new Category("CATEGORY_B"));
 
-        Product savedProduct = repository.save(new Product(1L, 1L, new Money(PRICE)));
-        ProductUpdateRequest request = new ProductUpdateRequest(2L, 2L, changedPrice);
+        Product savedProduct =
+                repository.save(
+                        new Product(originBrand.getId(), originCategory.getId(), new Money(PRICE)));
+        ProductUpdateRequest request =
+                new ProductUpdateRequest(
+                        changedBrand.getId(), changedCategory.getId(), changedPrice);
 
         // when
         service.updateProduct(savedProduct.getId(), request);
@@ -121,8 +127,8 @@ class ProductServiceIntegrationTest {
         // then
         Optional<Product> findProduct = repository.findById(savedProduct.getId());
         assertThat(findProduct).isPresent();
-        assertThat(findProduct.get().getBrandId()).isEqualTo(changedBrandId);
-        assertThat(findProduct.get().getCategoryId()).isEqualTo(changedCategoryId);
+        assertThat(findProduct.get().getBrandId()).isEqualTo(changedBrand.getId());
+        assertThat(findProduct.get().getCategoryId()).isEqualTo(changedCategory.getId());
         assertThat(findProduct.get().getPrice().getValue()).isEqualTo(changedPrice);
     }
 
@@ -136,5 +142,33 @@ class ProductServiceIntegrationTest {
         // when, then
         assertThatThrownBy(() -> service.updateProduct(notExistId, request))
                 .isInstanceOf(NotExistProductException.class);
+    }
+
+    @DisplayName("product 업데이트 실패: brand가 존재하지 않을 경우")
+    @Test
+    void updateProduct_WhenNotExistBrand_ShouldThrowException() {
+        // given
+        Long notExistId = 2L;
+        Product savedProduct = repository.save(new Product(1L, 1L, new Money(PRICE)));
+        ProductUpdateRequest request = new ProductUpdateRequest(notExistId, 1L, new BigDecimal(2L));
+
+        // when, then
+        assertThatThrownBy(() -> service.updateProduct(savedProduct.getId(), request))
+                .isInstanceOf(NotExistBrandException.class);
+    }
+
+    @DisplayName("product 업데이트 실패: category가 존재하지 않을 경우")
+    @Test
+    void updateProduct_WhenNotExistCategory_ShouldThrowException() {
+        // given
+        Long notExistId = 2L;
+        Product savedProduct = repository.save(new Product(1L, 1L, new Money(PRICE)));
+        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
+        ProductUpdateRequest request =
+                new ProductUpdateRequest(brandA.getId(), notExistId, new BigDecimal(2L));
+
+        // when, then
+        assertThatThrownBy(() -> service.updateProduct(savedProduct.getId(), request))
+                .isInstanceOf(NotExistCategoryException.class);
     }
 }

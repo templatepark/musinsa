@@ -124,18 +124,23 @@ class ProductServiceUnitTest {
         then(productRepository).should().findById(anyLong());
     }
 
-    @DisplayName("product 업데이트 성공: product가 존재할 경우")
+    @DisplayName("product 업데이트 성공: product, brand, category가 존재할 경우")
     @Test
     void updateProduct_WhenExistProduct_ShouldSuccess() {
         // given
         Product returnProduct = new Product(1L, 1L, new Money(PRICE));
         given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
+        given(brandRepository.findById(any())).willReturn(Optional.of(new Brand("BRAND_A")));
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(new Category("CATEGORY_A")));
 
         ProductUpdateRequest request = new ProductUpdateRequest(2L, 2L, new BigDecimal(2L));
 
         // when, then
         assertThatCode(() -> service.updateProduct(1L, request)).doesNotThrowAnyException();
         then(productRepository).should().findById(anyLong());
+        then(brandRepository).should().findById(anyLong());
+        then(categoryRepository).should().findById(anyLong());
     }
 
     @DisplayName("product 업데이트 실패: product가 존재하지 않을 경우")
@@ -149,5 +154,40 @@ class ProductServiceUnitTest {
         assertThatThrownBy(() -> service.updateProduct(1L, request))
                 .isInstanceOf(NotExistProductException.class);
         then(productRepository).should().findById(anyLong());
+        then(brandRepository).shouldHaveNoInteractions();
+        then(categoryRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("product 업데이트 실패: brand가 존재하지 않을 경우")
+    @Test
+    void updateProduct_WhenNotExistBrand_ShouldThrowException() {
+        // given
+        Product returnProduct = new Product(1L, 1L, new Money(PRICE));
+        ProductUpdateRequest request = new ProductUpdateRequest(1L, 1L, PRICE);
+        given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
+        given(brandRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> service.updateProduct(1L, request))
+                .isInstanceOf(NotExistBrandException.class);
+        then(productRepository).should().findById(anyLong());
+        then(categoryRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("product 업데이트 실패: category가 존재하지 않을 경우")
+    @Test
+    void updateProduct_WhenNotExistCategory_ShouldThrowException() {
+        // given
+        Product returnProduct = new Product(1L, 1L, new Money(PRICE));
+        ProductUpdateRequest request = new ProductUpdateRequest(1L, 1L, PRICE);
+        given(productRepository.findById(any())).willReturn(Optional.of(returnProduct));
+        given(brandRepository.findById(any())).willReturn(Optional.of(new Brand("BRAND_A")));
+        given(categoryRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> service.updateProduct(1L, request))
+                .isInstanceOf(NotExistCategoryException.class);
+        then(productRepository).should().findById(anyLong());
+        then(categoryRepository).should().findById(anyLong());
     }
 }
