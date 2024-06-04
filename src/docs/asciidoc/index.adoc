@@ -1,0 +1,10 @@
+= Musinsa REST Docs
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:seclinks:
+
+include::product_query.adoc[]
+include::brand.adoc[]
+include::product.adoc[]

@@ -1,0 +1,23 @@
+== 카테고리 별 최저가격 조회
+=== 성공: 데이터가 존재할 경우
+operation::product-query-controller-unit-test/get-category-lowest-prices_-when-data-exist_-should-return-data[snippets="http-request,http-response"]
+
+=== 성공: 데이터가 존재하지 않을 경우
+operation::product-query-controller-unit-test/get-category-lowest-prices_-when-data-not-exist_-should-return-data[snippets="http-request,http-response"]
+
+== 단일 브랜드로 모든 카테고리 상품을 구매할 때 최저가격 조회
+=== 성공: 데이터가 존재할 경우
+operation::product-query-controller-unit-test/get-lowest-total-brand-price_-when-data-exist_-should-return-data[snippets="http-request,http-response"]
+
+=== 성공: 데이터가 존재하지 않을 경우
+operation::product-query-controller-unit-test/get-lowest-total-brand-price_-when-data-not-exist_-should-return-empty[snippets="http-request,http-response"]
+
+== 카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회
+=== 성공: 데이터가 존재할 경우
+operation::product-query-controller-unit-test/get-lowest-and-highest-prices-by-category-name_-when-data-exist_-should-return-data[snippets="http-request,http-response"]
+
+=== 성공: 데이터가 존재하지 않을 경우
+operation::product-query-controller-unit-test/get-lowest-and-highest-prices-by-category-name_-when-data-not-exist_-should-return-data[snippets="http-request,http-response"]
+
+=== 실패: request가 invalid한 경우
+operation::product-query-controller-unit-test/get-lowest-and-highest-prices-by-category-name_-when-category-name-null-or-empty_-should-return-data[snippets="http-request,http-response"]

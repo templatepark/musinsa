@@ -19,17 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.musinsa.common.support.AbstractRestDocsTests;
 import com.musinsa.product.application.*;
 import com.musinsa.product.application.dto.*;
 import com.musinsa.product.presentation.api.ProductQueryController;
 
 @WebMvcTest(ProductQueryController.class)
-class ProductQueryControllerUnitTest {
-    @Autowired private MockMvc mockMvc;
+class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
 
     @Autowired private ObjectMapper objectMapper;
 
