@@ -3,11 +3,14 @@ package com.musinsa.product.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.musinsa.brand.domain.Brand;
@@ -28,6 +31,37 @@ public class ProductQueryServiceIntegrationTest {
     @Autowired private ProductRepository productRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private BrandRepository brandRepository;
+    @Autowired private CacheManager cacheManager;
+    private Brand brandA;
+    private Brand brandB;
+    private Brand brandC;
+    private Brand brandD;
+    private Category categoryA;
+    private Category categoryB;
+
+    @BeforeEach
+    void setup() {
+        brandA = brandRepository.save(new Brand("BRAND_A"));
+        brandB = brandRepository.save(new Brand("BRAND_B"));
+        brandC = brandRepository.save(new Brand("BRAND_C"));
+        brandD = brandRepository.save(new Brand("BRAND_D"));
+        categoryA = categoryRepository.save(new Category("CATEGORY_A"));
+        categoryB = categoryRepository.save(new Category("CATEGORY_B"));
+        clearCache();
+    }
+
+    private void clearCache() {
+        cacheManager
+                .getCacheNames()
+                .forEach(
+                        cacheName -> {
+                            cacheManager.getCache(cacheName).clear();
+                        });
+    }
+
+    private void createProducts(List<Product> products) {
+        productRepository.saveAll(products);
+    }
 
     @DisplayName("카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회: 데이터가 존재할 경우")
     @Test
@@ -37,37 +71,31 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal highestPrice = new BigDecimal(1000L);
         BigDecimal expectedTotalPrice = lowestPrice.add(lowestPrice);
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Category categoryA = categoryRepository.save(new Category("CATEGORY_A"));
-        Category categoryB = categoryRepository.save(new Category("CATEGORY_B"));
+        createProducts(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandA.getId(), categoryB.getId(), new Money(lowestPrice)),
+                        new Product(brandB.getId(), categoryB.getId(), new Money(highestPrice))));
 
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandA.getId(), categoryB.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryB.getId(), new Money(highestPrice)));
         // when
         CategoryLowestPriceResponse result = service.getCategoryLowestPrices();
 
         // then
         assertThat(result.categoryPrices())
-                .filteredOn(cate -> cate.categoryName().equals("CATEGORY_A"))
+                .filteredOn(cate -> cate.categoryName().equals(categoryA.getName()))
                 .extracting(CategoryBrandPriceResponse::brandName)
                 .containsExactly(brandB.getName());
 
         assertThat(result.categoryPrices())
-                .filteredOn(cate -> cate.categoryName().equals("CATEGORY_B"))
+                .filteredOn(cate -> cate.categoryName().equals(categoryB.getName()))
                 .extracting(CategoryBrandPriceResponse::brandName)
                 .containsExactly(brandA.getName());
 
         assertThat(result.totalPrice()).isEqualByComparingTo(expectedTotalPrice);
     }
 
-    @DisplayName("카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회: 데이터가 존재하지않을 경우")
+    @DisplayName("카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회: 데이터가 존재하지 않을 경우")
     @Test
     void getCategoryLowestPrices_WhenDataNotExist_ShouldReturnEmptyData() {
         // given
@@ -81,30 +109,26 @@ public class ProductQueryServiceIntegrationTest {
         assertThat(result.totalPrice()).isEqualByComparingTo(expectedTotalPrice);
     }
 
-    @DisplayName("카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회: 같은 최저가 브랜드 존재 시, 이름오름차 순으로 조회")
+    @DisplayName("카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회: 같은 최저가 브랜드 존재 시, 이름 오름차순으로 조회")
     @Test
     void getCategoryLowestPrices_WhenDupLowestPriceBrandExist_ShouldReturnDataByBrandNameASC() {
         // given
         BigDecimal lowestPrice = new BigDecimal(100L);
-        BigDecimal expectedTotalPrice = lowestPrice;
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Category categoryA = categoryRepository.save(new Category("CATEGORY_A"));
+        createProducts(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice))));
 
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)));
         // when
         CategoryLowestPriceResponse result = service.getCategoryLowestPrices();
 
         // then
         assertThat(result.categoryPrices())
-                .filteredOn(cate -> cate.categoryName().equals("CATEGORY_A"))
+                .filteredOn(cate -> cate.categoryName().equals(categoryA.getName()))
                 .extracting(CategoryBrandPriceResponse::brandName)
                 .containsExactly(brandA.getName());
-        assertThat(result.totalPrice()).isEqualByComparingTo(expectedTotalPrice);
+        assertThat(result.totalPrice()).isEqualByComparingTo(lowestPrice);
     }
 
     @DisplayName("단일 브랜드로 모든 카테고리 합이 최저가 조회: 데이터가 존재할 경우")
@@ -115,19 +139,13 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal highestPrice = new BigDecimal(1000L);
         BigDecimal expectedTotalPrice = lowestPrice.add(lowestPrice);
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Category categoryA = categoryRepository.save(new Category("CATEGORY_A"));
-        Category categoryB = categoryRepository.save(new Category("CATEGORY_B"));
+        createProducts(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)),
+                        new Product(brandA.getId(), categoryB.getId(), new Money(highestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice))));
 
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandA.getId(), categoryB.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice)));
         // when
         BrandLowestPriceResponse result = service.getLowestTotalBrandPrice();
 
@@ -154,26 +172,20 @@ public class ProductQueryServiceIntegrationTest {
         assertThat(result.lowestPrice().totalPrice()).isEqualByComparingTo(expectedTotalPrice);
     }
 
-    @DisplayName("단일 브랜드로 모든 카테고리 합이 최저가 조회: 같은 최저가 브랜드 존재 시, 이름오름차 순으로 조회")
+    @DisplayName("단일 브랜드로 모든 카테고리 합이 최저가 조회: 같은 최저가 브랜드 존재 시, 이름 오름차순으로 조회")
     @Test
     void getLowestTotalBrandPrice_WhenDupLowestPriceBrandExist_ShouldReturnData() {
         // given
         BigDecimal lowestPrice = new BigDecimal(100L);
         BigDecimal expectedTotalPrice = lowestPrice.add(lowestPrice);
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Category categoryA = categoryRepository.save(new Category("CATEGORY_A"));
-        Category categoryB = categoryRepository.save(new Category("CATEGORY_B"));
+        createProducts(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandA.getId(), categoryB.getId(), new Money(lowestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice))));
 
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandA.getId(), categoryB.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice)));
         // when
         BrandLowestPriceResponse result = service.getLowestTotalBrandPrice();
 
@@ -193,14 +205,11 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal lowestPrice = new BigDecimal(100L);
         BigDecimal highestPrice = new BigDecimal(1000L);
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Category categoryA = categoryRepository.save(new Category(categoryName));
+        productRepository.saveAll(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice))));
 
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice)));
         // when
         CategoryLowestAndHighestPriceResponse result =
                 service.getLowestAndHighestPricesByCategoryName(categoryName);
@@ -241,20 +250,12 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal lowestPrice = new BigDecimal(100L);
         BigDecimal highestPrice = new BigDecimal(1000L);
 
-        Brand brandA = brandRepository.save(new Brand("BRAND_A"));
-        Brand brandB = brandRepository.save(new Brand("BRAND_B"));
-        Brand brandC = brandRepository.save(new Brand("BRAND_C"));
-        Brand brandD = brandRepository.save(new Brand("BRAND_D"));
-        Category categoryA = categoryRepository.save(new Category(categoryName));
-
-        productRepository.save(
-                new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandB.getId(), categoryA.getId(), new Money(highestPrice)));
-        productRepository.save(
-                new Product(brandC.getId(), categoryA.getId(), new Money(lowestPrice)));
-        productRepository.save(
-                new Product(brandD.getId(), categoryA.getId(), new Money(lowestPrice)));
+        productRepository.saveAll(
+                List.of(
+                        new Product(brandA.getId(), categoryA.getId(), new Money(highestPrice)),
+                        new Product(brandB.getId(), categoryA.getId(), new Money(highestPrice)),
+                        new Product(brandC.getId(), categoryA.getId(), new Money(lowestPrice)),
+                        new Product(brandD.getId(), categoryA.getId(), new Money(lowestPrice))));
 
         // when
         CategoryLowestAndHighestPriceResponse result =

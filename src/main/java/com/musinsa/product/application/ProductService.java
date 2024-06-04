@@ -1,10 +1,12 @@
 package com.musinsa.product.application;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.musinsa.brand.domain.BrandRepository;
 import com.musinsa.category.domain.CategoryRepository;
+import com.musinsa.common.constants.CacheNames;
 import com.musinsa.product.application.dto.ProductSaveRequest;
 import com.musinsa.product.application.dto.ProductUpdateRequest;
 import com.musinsa.product.application.exception.NotExistBrandException;
@@ -29,6 +31,13 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
+    @CacheEvict(
+            value = {
+                CacheNames.CATEGORY_LOWEST_PRICES,
+                CacheNames.BRAND_TOTAL_LOWEST_PRICE,
+                CacheNames.CATEGORY_LOWEST_HIGHEST_PRICES
+            },
+            allEntries = true)
     @Transactional
     public Long saveProduct(ProductSaveRequest request) {
         validateExistBrand(request.brandId());
@@ -48,12 +57,26 @@ public class ProductService {
                 .orElseThrow(() -> new NotExistCategoryException("해당 카테고리가 존재하지 않습니다."));
     }
 
+    @CacheEvict(
+            value = {
+                CacheNames.CATEGORY_LOWEST_PRICES,
+                CacheNames.BRAND_TOTAL_LOWEST_PRICE,
+                CacheNames.CATEGORY_LOWEST_HIGHEST_PRICES
+            },
+            allEntries = true)
     @Transactional
     public void deleteProduct(Long productId) {
         Product findProduct = findProductByIdOrThrow(productId);
         findProduct.delete();
     }
 
+    @CacheEvict(
+            value = {
+                CacheNames.CATEGORY_LOWEST_PRICES,
+                CacheNames.BRAND_TOTAL_LOWEST_PRICE,
+                CacheNames.CATEGORY_LOWEST_HIGHEST_PRICES
+            },
+            allEntries = true)
     @Transactional
     public void updateProduct(Long productId, ProductUpdateRequest request) {
         Product findProduct = findProductByIdOrThrow(productId);

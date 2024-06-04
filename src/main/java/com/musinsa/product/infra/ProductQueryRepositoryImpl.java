@@ -26,6 +26,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    //    @Cacheable(CacheNames.CATEGORY_LOWEST_PRICES)
     @Override
     public List<CategoryBrandPriceResponse> getCategoryLowestPrices() {
         String sql =
@@ -58,6 +59,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
         return categoryBrandPrices;
     }
 
+    //    @Cacheable(CacheNames.BRAND_TOTAL_LOWEST_PRICE)
     @Override
     public BrandLowestPriceResponse getLowestTotalBrandPrice() {
         String sql =
@@ -98,6 +100,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
                 new BrandCategoryTotalResponse(brandName.get(), categoryPrices, totalPrice.get()));
     }
 
+    //    @Cacheable(CacheNames.CATEGORY_LOWEST_HIGHEST_PRICES)
     @Override
     public CategoryLowestAndHighestPriceResponse getLowestAndHighestPricesByCategoryName(
             String categoryName) {
