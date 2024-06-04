@@ -44,7 +44,7 @@ public class ProductUIController {
 
     @GetMapping("/products/category")
     public String getCategoryPricesPage(
-            @RequestParam(required = false) String categoryName, Model model) {
+            @RequestParam(name = "categoryName", required = false) String categoryName, Model model) {
         if (categoryName == null || categoryName.isEmpty()) {
             return "redirect:/products/category-search-form";
         }
