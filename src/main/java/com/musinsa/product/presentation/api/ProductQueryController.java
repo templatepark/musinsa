@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.musinsa.product.application.ProductQueryService;
-import com.musinsa.product.application.dto.BrandLowestPriceResponse;
+import com.musinsa.product.application.dto.BrandLowestTotalPriceResponse;
 import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
-import com.musinsa.product.application.dto.CategoryLowestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestPricesResponse;
 
 @RestController
 public class ProductQueryController {
@@ -22,20 +22,19 @@ public class ProductQueryController {
     }
 
     @GetMapping(path = "/api/v1/products/category-lowest-prices")
-    public ResponseEntity<CategoryLowestPriceResponse> getCategoryLowestPrices() {
+    public ResponseEntity<CategoryLowestPricesResponse> getCategoryLowestPrices() {
         return ResponseEntity.ok().body(productQueryService.getCategoryLowestPrices());
     }
 
     @GetMapping(path = "/api/v1/products/lowest-total-brand-price")
-    public ResponseEntity<BrandLowestPriceResponse> getLowestTotalBrandPrice() {
-        return ResponseEntity.ok().body(productQueryService.getLowestTotalBrandPrice());
+    public ResponseEntity<BrandLowestTotalPriceResponse> getBrandLowestTotalPrice() {
+        return ResponseEntity.ok().body(productQueryService.getBrandLowestTotalPrice());
     }
 
     @GetMapping(path = "/api/v1/products/category-lowest-highest-prices")
-    public ResponseEntity<CategoryLowestAndHighestPriceResponse>
-            getLowestAndHighestPricesByCategoryName(
-                    @RequestParam(name = "categoryName") @NotBlank String categoryName) {
+    public ResponseEntity<CategoryLowestAndHighestPriceResponse> getCategoryLowestAndHighestPrices(
+            @RequestParam(name = "categoryName") @NotBlank String categoryName) {
         return ResponseEntity.ok()
-                .body(productQueryService.getLowestAndHighestPricesByCategoryName(categoryName));
+                .body(productQueryService.getCategoryLowestAndHighestPrices(categoryName));
     }
 }

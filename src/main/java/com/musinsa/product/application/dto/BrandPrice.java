@@ -2,4 +2,4 @@ package com.musinsa.product.application.dto;
 
 import java.math.BigDecimal;
 
-public record BrandPriceResponse(String brandName, BigDecimal price) {}
+public record BrandPrice(String brandName, BigDecimal price) {}

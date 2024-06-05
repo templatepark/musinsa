@@ -4,5 +4,5 @@ import java.util.List;
 
 public record CategoryLowestAndHighestPriceResponse(
         String categoryName,
-        List<BrandPriceResponse> lowestBrandPrices,
-        List<BrandPriceResponse> highestBrandPrices) {}
+        List<BrandPrice> lowestBrandPrices,
+        List<BrandPrice> highestBrandPrices) {}

@@ -1,16 +1,16 @@
 package com.musinsa.product.domain;
 
 import java.util.List;
+import java.util.Optional;
 
-import com.musinsa.product.application.dto.BrandLowestPriceResponse;
-import com.musinsa.product.application.dto.CategoryBrandPriceResponse;
-import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
+import com.musinsa.product.application.dto.*;
 
 public interface ProductQueryRepository {
-    List<CategoryBrandPriceResponse> getCategoryLowestPrices();
+    List<CategoryBrandPriceWithRank> getCategoryLowestPrices();
 
-    BrandLowestPriceResponse getLowestTotalBrandPrice();
+    Optional<BrandIdAndName> getLowestTotalBrandIdAndName();
 
-    CategoryLowestAndHighestPriceResponse getLowestAndHighestPricesByCategoryName(
-            String categoryName);
+    List<CategoryPrice> getBrandLowestTotalPrice(Long brandId);
+
+    List<BrandNameAndPriceWithRank> getCategoryLowestAndHighestPrices(String categoryName);
 }

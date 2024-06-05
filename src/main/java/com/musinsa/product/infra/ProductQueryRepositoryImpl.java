@@ -1,150 +1,125 @@
 package com.musinsa.product.infra;
 
-import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
-import com.musinsa.common.constants.CacheNames;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.musinsa.product.application.dto.BrandCategoryTotalResponse;
-import com.musinsa.product.application.dto.BrandLowestPriceResponse;
-import com.musinsa.product.application.dto.BrandPriceResponse;
-import com.musinsa.product.application.dto.CategoryBrandPriceResponse;
-import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
-import com.musinsa.product.application.dto.CategoryPriceResponse;
+import com.blazebit.persistence.querydsl.JPQLNextExpressions;
+import com.musinsa.brand.domain.QBrand;
+import com.musinsa.category.domain.QCategory;
+import com.musinsa.product.application.dto.*;
 import com.musinsa.product.domain.ProductQueryRepository;
+import com.musinsa.product.domain.QProduct;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
 public class ProductQueryRepositoryImpl implements ProductQueryRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final JPAQueryFactory queryFactory;
 
-    public ProductQueryRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ProductQueryRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
     }
 
-        @Cacheable(CacheNames.CATEGORY_LOWEST_PRICES)
     @Override
-    public List<CategoryBrandPriceResponse> getCategoryLowestPrices() {
-        String sql =
-                "WITH CategoryMinPrices AS ( "
-                        + "    SELECT c.category_name, b.brand_name, p.price, "
-                        + "           ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.price, b.brand_name) AS rn "
-                        + "    FROM product p "
-                        + "    INNER JOIN category c ON p.category_id = c.category_id "
-                        + "    INNER JOIN brand b ON p.brand_id = b.brand_id "
-                        + "    WHERE p.deleted = false "
-                        + ") "
-                        + "SELECT category_name, brand_name, price "
-                        + "FROM CategoryMinPrices "
-                        + "WHERE rn = 1 "
-                        + "ORDER BY category_name, brand_name";
+    public List<CategoryBrandPriceWithRank> getCategoryLowestPrices() {
+        QProduct product = QProduct.product;
+        QBrand brand = QBrand.brand;
+        QCategory category = QCategory.category;
 
-        List<CategoryBrandPriceResponse> categoryBrandPrices = new ArrayList<>();
-
-        jdbcTemplate.query(
-                connection -> connection.prepareStatement(sql),
-                (rs) -> {
-                    String categoryName = rs.getString("category_name");
-                    String brandName = rs.getString("brand_name");
-                    BigDecimal price = rs.getBigDecimal("price");
-
-                    categoryBrandPrices.add(
-                            new CategoryBrandPriceResponse(categoryName, brandName, price));
-                });
-
-        return categoryBrandPrices;
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                CategoryBrandPriceWithRank.class,
+                                category.name,
+                                brand.name,
+                                product.price.value,
+                                JPQLNextExpressions.rowNumber()
+                                        .over()
+                                        .partitionBy(product.categoryId)
+                                        .orderBy(product.price.value.asc(), brand.name.asc())
+                                        .as("rn")))
+                .from(product)
+                .innerJoin(category)
+                .on(product.categoryId.eq(category.id))
+                .innerJoin(brand)
+                .on(product.brandId.eq(brand.id))
+                .where(product.deleted.isFalse())
+                .orderBy(category.name.asc())
+                .orderBy(brand.name.asc())
+                .fetch();
     }
 
-        @Cacheable(CacheNames.BRAND_TOTAL_LOWEST_PRICE)
     @Override
-    public BrandLowestPriceResponse getLowestTotalBrandPrice() {
-        String sql =
-                "WITH MinBrand AS ( "
-                        + "    SELECT p.brand_id, b.brand_name, SUM(p.price) AS total_price "
-                        + "    FROM product p "
-                        + "    INNER JOIN brand b ON p.brand_id = b.brand_id "
-                        + "    WHERE p.deleted = false "
-                        + "    GROUP BY p.brand_id, b.brand_name "
-                        + "    ORDER BY total_price "
-                        + "    LIMIT 1 "
-                        + ") "
-                        + "SELECT c.category_name, mb.brand_name, p.price "
-                        + "FROM product p "
-                        + "INNER JOIN category c ON p.category_id = c.category_id "
-                        + "INNER JOIN MinBrand mb ON p.brand_id = mb.brand_id "
-                        + "WHERE p.deleted = false "
-                        + "ORDER BY c.category_name";
+    public Optional<BrandIdAndName> getLowestTotalBrandIdAndName() {
+        QProduct product = QProduct.product;
+        QBrand brand = QBrand.brand;
+        QCategory category = QCategory.category;
 
-        List<CategoryPriceResponse> categoryPrices = new ArrayList<>();
-        AtomicReference<String> brandName = new AtomicReference<>(null);
-        AtomicReference<BigDecimal> totalPrice = new AtomicReference<>(BigDecimal.ZERO);
-
-        jdbcTemplate.query(
-                connection -> connection.prepareStatement(sql),
-                (rs, rowNum) -> {
-                    String categoryName = rs.getString("category_name");
-                    String brand = rs.getString("brand_name");
-                    BigDecimal price = rs.getBigDecimal("price");
-
-                    categoryPrices.add(new CategoryPriceResponse(categoryName, price));
-                    brandName.set(brand);
-                    totalPrice.set(totalPrice.get().add(price));
-                    return null;
-                });
-
-        return new BrandLowestPriceResponse(
-                new BrandCategoryTotalResponse(brandName.get(), categoryPrices, totalPrice.get()));
+        return Optional.ofNullable(
+                queryFactory
+                        .select(Projections.constructor(BrandIdAndName.class, brand.id, brand.name))
+                        .from(product)
+                        .innerJoin(category)
+                        .on(product.categoryId.eq(category.id))
+                        .innerJoin(brand)
+                        .on(product.brandId.eq(brand.id))
+                        .where(product.deleted.isFalse())
+                        .groupBy(product.brandId)
+                        .orderBy(product.price.value.sum().asc())
+                        .limit(1)
+                        .fetchOne());
     }
 
-        @Cacheable(CacheNames.CATEGORY_LOWEST_HIGHEST_PRICES)
     @Override
-    public CategoryLowestAndHighestPriceResponse getLowestAndHighestPricesByCategoryName(
-            String categoryName) {
-        String sql =
-                "WITH RankedPrices AS ( "
-                        + "    SELECT c.category_name, b.brand_name, p.price, "
-                        + "           DENSE_RANK() OVER (PARTITION BY p.category_id ORDER BY p.price ASC) AS min_rn, "
-                        + "           DENSE_RANK() OVER (PARTITION BY p.category_id ORDER BY p.price DESC) AS max_rn "
-                        + "    FROM product p "
-                        + "    INNER JOIN category c ON p.category_id = c.category_id "
-                        + "    INNER JOIN brand b ON p.brand_id = b.brand_id "
-                        + "    WHERE p.deleted = false "
-                        + "      AND c.category_name = ? "
-                        + ") "
-                        + "SELECT category_name, brand_name, price, min_rn, max_rn "
-                        + "FROM RankedPrices "
-                        + "WHERE min_rn = 1 OR max_rn = 1 "
-                        + "ORDER BY category_name, brand_name";
+    public List<CategoryPrice> getBrandLowestTotalPrice(Long brandId) {
+        QProduct product = QProduct.product;
+        QCategory category = QCategory.category;
 
-        List<BrandPriceResponse> lowestPrices = new ArrayList<>();
-        List<BrandPriceResponse> highestPrices = new ArrayList<>();
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                CategoryPrice.class, category.name, product.price.value))
+                .from(product)
+                .innerJoin(category)
+                .on(product.categoryId.eq(category.id))
+                .where(product.brandId.eq(brandId))
+                .orderBy(category.name.asc())
+                .fetch();
+    }
 
-        jdbcTemplate.query(
-                connection -> {
-                    PreparedStatement ps = connection.prepareStatement(sql);
-                    ps.setString(1, categoryName);
-                    return ps;
-                },
-                (rs) -> {
-                    String brandName = rs.getString("brand_name");
-                    BigDecimal price = rs.getBigDecimal("price");
-                    int minRn = rs.getInt("min_rn");
-                    int maxRn = rs.getInt("max_rn");
+    @Override
+    public List<BrandNameAndPriceWithRank> getCategoryLowestAndHighestPrices(String categoryName) {
+        QProduct product = QProduct.product;
+        QBrand brand = QBrand.brand;
+        QCategory category = QCategory.category;
 
-                    if (minRn == 1) {
-                        lowestPrices.add(new BrandPriceResponse(brandName, price));
-                    }
-                    if (maxRn == 1) {
-                        highestPrices.add(new BrandPriceResponse(brandName, price));
-                    }
-                });
-
-        return new CategoryLowestAndHighestPriceResponse(categoryName, lowestPrices, highestPrices);
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                BrandNameAndPriceWithRank.class,
+                                brand.name,
+                                product.price.value,
+                                JPQLNextExpressions.denseRank()
+                                        .over()
+                                        .partitionBy(product.categoryId)
+                                        .orderBy(product.price.value.asc())
+                                        .as("min_rn"),
+                                JPQLNextExpressions.denseRank()
+                                        .over()
+                                        .partitionBy(product.categoryId)
+                                        .orderBy(product.price.value.desc())
+                                        .as("max_rn")))
+                .from(product)
+                .innerJoin(category)
+                .on(product.categoryId.eq(category.id))
+                .innerJoin(brand)
+                .on(product.brandId.eq(brand.id))
+                .where(product.deleted.isFalse().and(category.name.eq(categoryName)))
+                .orderBy(category.name.asc())
+                .orderBy(brand.name.asc())
+                .fetch();
     }
 }

@@ -38,10 +38,10 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
     @Test
     void getCategoryLowestPrices_WhenDataExist_ShouldReturnData() throws Exception {
         // given
-        CategoryLowestPriceResponse expectedResponse =
-                new CategoryLowestPriceResponse(
+        CategoryLowestPricesResponse expectedResponse =
+                new CategoryLowestPricesResponse(
                         List.of(
-                                new CategoryBrandPriceResponse(
+                                new CategoryBrandPrice(
                                         "CATEGORY_A", "BRAND_A", new BigDecimal(100L))),
                         new BigDecimal(100L));
         given(productQueryService.getCategoryLowestPrices()).willReturn(expectedResponse);
@@ -60,8 +60,8 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
     @Test
     void getCategoryLowestPrices_WhenDataNotExist_ShouldReturnData() throws Exception {
         // given
-        CategoryLowestPriceResponse expectedResponse =
-                new CategoryLowestPriceResponse(List.of(), new BigDecimal(0L));
+        CategoryLowestPricesResponse expectedResponse =
+                new CategoryLowestPricesResponse(List.of(), new BigDecimal(0L));
         given(productQueryService.getCategoryLowestPrices()).willReturn(expectedResponse);
 
         // when
@@ -78,15 +78,13 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
     @Test
     void getLowestTotalBrandPrice_WhenDataExist_ShouldReturnData() throws Exception {
         // given
-        BrandLowestPriceResponse expectedResponse =
-                new BrandLowestPriceResponse(
-                        new BrandCategoryTotalResponse(
+        BrandLowestTotalPriceResponse expectedResponse =
+                new BrandLowestTotalPriceResponse(
+                        new BrandCategoryTotal(
                                 "BRAND_A",
-                                List.of(
-                                        new CategoryPriceResponse(
-                                                "CATEGORY_A", new BigDecimal(100L))),
+                                List.of(new CategoryPrice("CATEGORY_A", new BigDecimal(100L))),
                                 new BigDecimal(100L)));
-        given(productQueryService.getLowestTotalBrandPrice()).willReturn(expectedResponse);
+        given(productQueryService.getBrandLowestTotalPrice()).willReturn(expectedResponse);
 
         // when
         ResultActions result =
@@ -96,17 +94,17 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
-        then(productQueryService).should().getLowestTotalBrandPrice();
+        then(productQueryService).should().getBrandLowestTotalPrice();
     }
 
     @DisplayName("단일 브랜드로 모든 카테고리 합이 최저가 조회: 데이터가 존재하지 않을 경우")
     @Test
     void getLowestTotalBrandPrice_WhenDataNotExist_ShouldReturnEmpty() throws Exception {
         // given
-        BrandLowestPriceResponse expectedResponse =
-                new BrandLowestPriceResponse(
-                        new BrandCategoryTotalResponse(null, List.of(), new BigDecimal(0L)));
-        given(productQueryService.getLowestTotalBrandPrice()).willReturn(expectedResponse);
+        BrandLowestTotalPriceResponse expectedResponse =
+                new BrandLowestTotalPriceResponse(
+                        new BrandCategoryTotal(null, List.of(), new BigDecimal(0L)));
+        given(productQueryService.getBrandLowestTotalPrice()).willReturn(expectedResponse);
 
         // when
         ResultActions result =
@@ -116,7 +114,7 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
-        then(productQueryService).should().getLowestTotalBrandPrice();
+        then(productQueryService).should().getBrandLowestTotalPrice();
     }
 
     @DisplayName("카테고리 이름으로 최저, 최고 가격 브랜드와 상품 가격 조회: 데이터가 존재할 경우")
@@ -127,9 +125,9 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         CategoryLowestAndHighestPriceResponse expectedResponse =
                 new CategoryLowestAndHighestPriceResponse(
                         categoryName,
-                        List.of(new BrandPriceResponse("BRAND_A", new BigDecimal(10L))),
-                        List.of(new BrandPriceResponse("BRAND_B", new BigDecimal(100L))));
-        given(productQueryService.getLowestAndHighestPricesByCategoryName(anyString()))
+                        List.of(new BrandPrice("BRAND_A", new BigDecimal(10L))),
+                        List.of(new BrandPrice("BRAND_B", new BigDecimal(100L))));
+        given(productQueryService.getCategoryLowestAndHighestPrices(anyString()))
                 .willReturn(expectedResponse);
 
         // when
@@ -141,7 +139,7 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
-        then(productQueryService).should().getLowestAndHighestPricesByCategoryName(anyString());
+        then(productQueryService).should().getCategoryLowestAndHighestPrices(anyString());
     }
 
     @DisplayName("카테고리 이름으로 최저, 최고 가격 브랜드와 상품 가격 조회: 데이터가 존재하지 않을 경우")
@@ -152,7 +150,7 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         String categoryName = "CATEGORY_A";
         CategoryLowestAndHighestPriceResponse expectedResponse =
                 new CategoryLowestAndHighestPriceResponse(categoryName, List.of(), List.of());
-        given(productQueryService.getLowestAndHighestPricesByCategoryName(anyString()))
+        given(productQueryService.getCategoryLowestAndHighestPrices(anyString()))
                 .willReturn(expectedResponse);
 
         // when
@@ -164,7 +162,7 @@ class ProductQueryControllerUnitTest extends AbstractRestDocsTests {
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
-        then(productQueryService).should().getLowestAndHighestPricesByCategoryName(anyString());
+        then(productQueryService).should().getCategoryLowestAndHighestPrices(anyString());
     }
 
     @DisplayName("카테고리 이름으로 최저, 최고 가격 브랜드와 상품 가격 조회 실패: 입력이 empty, null일 경우")

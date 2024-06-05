@@ -79,17 +79,17 @@ public class ProductQueryServiceIntegrationTest {
                         new Product(brandB.getId(), categoryB.getId(), new Money(highestPrice))));
 
         // when
-        CategoryLowestPriceResponse result = service.getCategoryLowestPrices();
+        CategoryLowestPricesResponse result = service.getCategoryLowestPrices();
 
         // then
         assertThat(result.categoryPrices())
                 .filteredOn(cate -> cate.categoryName().equals(categoryA.getName()))
-                .extracting(CategoryBrandPriceResponse::brandName)
+                .extracting(CategoryBrandPrice::brandName)
                 .containsExactly(brandB.getName());
 
         assertThat(result.categoryPrices())
                 .filteredOn(cate -> cate.categoryName().equals(categoryB.getName()))
-                .extracting(CategoryBrandPriceResponse::brandName)
+                .extracting(CategoryBrandPrice::brandName)
                 .containsExactly(brandA.getName());
 
         assertThat(result.totalPrice()).isEqualByComparingTo(expectedTotalPrice);
@@ -102,7 +102,7 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal expectedTotalPrice = new BigDecimal(0L);
 
         // when
-        CategoryLowestPriceResponse result = service.getCategoryLowestPrices();
+        CategoryLowestPricesResponse result = service.getCategoryLowestPrices();
 
         // then
         assertThat(result.categoryPrices()).isEmpty();
@@ -121,12 +121,12 @@ public class ProductQueryServiceIntegrationTest {
                         new Product(brandB.getId(), categoryA.getId(), new Money(lowestPrice))));
 
         // when
-        CategoryLowestPriceResponse result = service.getCategoryLowestPrices();
+        CategoryLowestPricesResponse result = service.getCategoryLowestPrices();
 
         // then
         assertThat(result.categoryPrices())
                 .filteredOn(cate -> cate.categoryName().equals(categoryA.getName()))
-                .extracting(CategoryBrandPriceResponse::brandName)
+                .extracting(CategoryBrandPrice::brandName)
                 .containsExactly(brandA.getName());
         assertThat(result.totalPrice()).isEqualByComparingTo(lowestPrice);
     }
@@ -147,12 +147,12 @@ public class ProductQueryServiceIntegrationTest {
                         new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice))));
 
         // when
-        BrandLowestPriceResponse result = service.getLowestTotalBrandPrice();
+        BrandLowestTotalPriceResponse result = service.getBrandLowestTotalPrice();
 
         // then
         assertThat(result.lowestPrice().brandName()).isEqualTo(brandB.getName());
         assertThat(result.lowestPrice().categories())
-                .extracting(CategoryPriceResponse::categoryName)
+                .extracting(CategoryPrice::categoryName)
                 .containsExactly(categoryA.getName(), categoryB.getName());
         assertThat(result.lowestPrice().totalPrice()).isEqualByComparingTo(expectedTotalPrice);
     }
@@ -164,7 +164,7 @@ public class ProductQueryServiceIntegrationTest {
         BigDecimal expectedTotalPrice = new BigDecimal(0L);
 
         // when
-        BrandLowestPriceResponse result = service.getLowestTotalBrandPrice();
+        BrandLowestTotalPriceResponse result = service.getBrandLowestTotalPrice();
 
         // then
         assertThat(result.lowestPrice().brandName()).isNull();
@@ -187,12 +187,12 @@ public class ProductQueryServiceIntegrationTest {
                         new Product(brandB.getId(), categoryB.getId(), new Money(lowestPrice))));
 
         // when
-        BrandLowestPriceResponse result = service.getLowestTotalBrandPrice();
+        BrandLowestTotalPriceResponse result = service.getBrandLowestTotalPrice();
 
         // then
         assertThat(result.lowestPrice().brandName()).isEqualTo(brandA.getName());
         assertThat(result.lowestPrice().categories())
-                .extracting(CategoryPriceResponse::categoryName)
+                .extracting(CategoryPrice::categoryName)
                 .containsExactly(categoryA.getName(), categoryB.getName());
         assertThat(result.lowestPrice().totalPrice()).isEqualByComparingTo(expectedTotalPrice);
     }
@@ -212,17 +212,17 @@ public class ProductQueryServiceIntegrationTest {
 
         // when
         CategoryLowestAndHighestPriceResponse result =
-                service.getLowestAndHighestPricesByCategoryName(categoryName);
+                service.getCategoryLowestAndHighestPrices(categoryName);
 
         // then
         assertThat(result.categoryName()).isEqualTo(categoryName);
         assertThat(result.highestBrandPrices())
                 .filteredOn(cate -> cate.price().compareTo(highestPrice) == 0)
-                .extracting(BrandPriceResponse::brandName)
+                .extracting(BrandPrice::brandName)
                 .containsExactly(brandA.getName());
         assertThat(result.lowestBrandPrices())
                 .filteredOn(cate -> cate.price().compareTo(lowestPrice) == 0)
-                .extracting(BrandPriceResponse::brandName)
+                .extracting(BrandPrice::brandName)
                 .containsExactly(brandB.getName());
     }
 
@@ -234,7 +234,7 @@ public class ProductQueryServiceIntegrationTest {
 
         // when
         CategoryLowestAndHighestPriceResponse result =
-                service.getLowestAndHighestPricesByCategoryName(categoryName);
+                service.getCategoryLowestAndHighestPrices(categoryName);
 
         // then
         assertThat(result.categoryName()).isEqualTo(categoryName);
@@ -259,7 +259,7 @@ public class ProductQueryServiceIntegrationTest {
 
         // when
         CategoryLowestAndHighestPriceResponse result =
-                service.getLowestAndHighestPricesByCategoryName(categoryName);
+                service.getCategoryLowestAndHighestPrices(categoryName);
 
         // then
         assertThat(result.categoryName()).isEqualTo(categoryName);

@@ -5,9 +5,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.musinsa.product.application.*;
-import com.musinsa.product.application.dto.BrandLowestPriceResponse;
+import com.musinsa.product.application.dto.BrandLowestTotalPriceResponse;
 import com.musinsa.product.application.dto.CategoryLowestAndHighestPriceResponse;
-import com.musinsa.product.application.dto.CategoryLowestPriceResponse;
+import com.musinsa.product.application.dto.CategoryLowestPricesResponse;
 
 @Controller
 public class ProductUIController {
@@ -25,14 +25,14 @@ public class ProductUIController {
 
     @GetMapping("/products/category-lowest-prices")
     public String getCategoryLowestPricesPage(Model model) {
-        CategoryLowestPriceResponse response = productQueryService.getCategoryLowestPrices();
+        CategoryLowestPricesResponse response = productQueryService.getCategoryLowestPrices();
         model.addAttribute("response", response);
         return "categoryLowestPrices";
     }
 
     @GetMapping("/products/lowest-total-brand-price")
     public String getLowestBrandPricePage(Model model) {
-        BrandLowestPriceResponse response = productQueryService.getLowestTotalBrandPrice();
+        BrandLowestTotalPriceResponse response = productQueryService.getBrandLowestTotalPrice();
         model.addAttribute("response", response);
         return "lowestTotalBrandPrice";
     }
@@ -44,12 +44,13 @@ public class ProductUIController {
 
     @GetMapping("/products/category")
     public String getCategoryPricesPage(
-            @RequestParam(name = "categoryName", required = false) String categoryName, Model model) {
+            @RequestParam(name = "categoryName", required = false) String categoryName,
+            Model model) {
         if (categoryName == null || categoryName.isEmpty()) {
             return "redirect:/products/category-search-form";
         }
         CategoryLowestAndHighestPriceResponse response =
-                productQueryService.getLowestAndHighestPricesByCategoryName(categoryName);
+                productQueryService.getCategoryLowestAndHighestPrices(categoryName);
         model.addAttribute("response", response);
         return "categoryLowestHighestPrices";
     }
