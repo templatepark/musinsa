@@ -93,4 +93,8 @@ public class ProductQueryService {
                 .map(request -> new BrandPrice(request.brandName(), request.price()))
                 .toList();
     }
+
+    public List<ProductWithDetails> findAllProducts() {
+        return productQueryRepository.findAllProducts();
+    }
 }

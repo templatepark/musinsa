@@ -122,4 +122,26 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
                 .orderBy(brand.name.asc())
                 .fetch();
     }
+
+    @Override
+    public List<ProductWithDetails> findAllProducts() {
+        QProduct product = QProduct.product;
+        QBrand brand = QBrand.brand;
+        QCategory category = QCategory.category;
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                ProductWithDetails.class,
+                                product.id,
+                                product.price.value,
+                                brand.name,
+                                category.name))
+                .from(product)
+                .innerJoin(category)
+                .on(product.categoryId.eq(category.id))
+                .innerJoin(brand)
+                .on(product.brandId.eq(brand.id))
+                .fetch();
+    }
 }

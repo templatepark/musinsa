@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>어드민 페이지</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<h1>어드민 페이지</h1>
+<button onclick="location.href='/brands/save'">브랜드 추가</button>
+<button onclick="location.href='/products/save'">상품 추가</button>
+<table>
+  <thead>
+  <tr>
+    <th>브랜드명</th>
+    <th>카테고리명</th>
+    <th>가격</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="product : ${products}">
+    <td th:text="${product.brandName}">브랜드명</td>
+    <td th:text="${product.categoryName}">카테고리명</td>
+    <td th:text="${product.price}">가격</td>
+    <td><a th:href="@{/products/{id}(id=${product.id})}">상세보기</a></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

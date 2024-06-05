@@ -32,7 +32,7 @@
       data: JSON.stringify(formData),
       success: function(response) {
         alert('브랜드 저장 성공');
-        window.location.href = '/';
+        window.location.href = '/admin';
       },
       error: function(xhr, status, error) {
         alert(xhr.responseJSON.detail);

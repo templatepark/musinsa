@@ -13,4 +13,6 @@ public interface ProductQueryRepository {
     List<CategoryPrice> getBrandLowestTotalPrice(Long brandId);
 
     List<BrandNameAndPriceWithRank> getCategoryLowestAndHighestPrices(String categoryName);
+
+    List<ProductWithDetails> findAllProducts();
 }
